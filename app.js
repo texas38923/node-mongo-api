@@ -18,13 +18,20 @@ connectToDb((err) => {
   }
 });
 
-//routes:
+//ROUTES:
 app.get('/books', (req, res) => {
+  //PAGINATION:
+  //current page:
+  const page = req.query.p || 0; //query string
+  const booksPerPage = 3;
+
   let books = [];
 
   db.collection('bookstore')
-    .find() //cursor toArray , forEach --> works in batches of a particular size to avoid MLE
+    .find() //returns a cursor pointing towards the batch of documents; toArray , forEach --> works in batches of a particular size to avoid MLE
     .sort({ author: 1 })
+    .skip(page * booksPerPage)
+    .limit(booksPerPage)
     .forEach((book) => books.push(book)) //async, promise returned
     .then(() => {
       res.status(200).json(books);
